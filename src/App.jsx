@@ -3,6 +3,7 @@ import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import "./App.css";
 import Navbar from "./components/Navbar";
 import Books from "./components/Books";
+import Cart from "./components/Cart";
 import Favorites from "./components/Favorites";
 
 
@@ -54,8 +55,8 @@ function App() {
         <Navbar total={price} />
         <Routes>
           <Route path="/" element={<Books books={data} handleAddToFavorites={handleAddToFavorites} handleAddToCart={handleAddToCart} />} />
-          <Route path="/favorites" element={<Favorites favoriteBooks={favoriteBooks} />} />
-          <Route path="/cart" element={<Cart booksInCart={booksInCart} total={price} />} />
+          <Route path="/Favorites" element={<Favorites favoriteBooks={favoriteBooks} />} />
+          <Route path="/Cart" element={<Cart booksInCart={booksInCart} total={price} />} />
         </Routes>
       </div>
     </Router>
