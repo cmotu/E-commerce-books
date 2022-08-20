@@ -1,40 +1,64 @@
-import { useState } from "react";
-import { useEffect } from "react";
+import { useState, useEffect } from "react";
+import {BrowserRouter as Router, Routes, Route} from "react-router-dom";
 import "./App.css";
-import "./components/Navbar";
 import Navbar from "./components/Navbar";
-import Book from "./components/Book";
+import Books from "./components/Books";
+import Favorites from "./components/Favorites";
+
 
 function App() {
-  const[data, setData] = useState([]);
+  const [data, setData] = useState([]);
   const [favoriteBooks, setFavoriteBooks] = useState([]);
-
+  const [price, setPrice] = useState(0);
+  const [booksInCart, setBooksInCart] = useState([]);
 
   const fetchData = () => {
-   fetch('https://api.itbook.store/1.0/new')
-     .then(res => res.json())
-     .then(data => setData(data.books))
- }
-useEffect(fetchData, [])
-
-
-const handleAddToFavorites = (book) =>{
-  const foundBook = favoriteBooks.find(b => b.isbn13 === book.isbn13);
-
-  if(foundBook){
-    setFavoriteBooks(favoriteBooks.filter(b => b.isbn13 !== book.isbn13))
-  } else {
-    setFavoriteBooks([...favoriteBooks, book])
+    fetch('https://api.itbook.store/1.0/new')
+      .then(res => res.json())
+      .then(data => setData(data.books))
   }
-}
+
+  useEffect(fetchData, [])
+
+  const handleAddToFavorites = (book) => {
+    const foundBook = favoriteBooks.find(b => b.isbn13 === book.isbn13);
+
+    if (foundBook) {
+      setFavoriteBooks(favoriteBooks.filter(b => b.isbn13 !== book.isbn13))
+    } else {
+      setFavoriteBooks([...favoriteBooks, book])
+    }
+  }
+
+  const handleAddToCart = (book) => {
+    const total = price + Number(book.price.substring(1));
+    setPrice(total);
+
+    let isInCart = booksInCart.find(b => b.isbn13 === book.isbn13);
+
+    let newCart = [...booksInCart];
+
+    if (!isInCart) {
+      isInCart = { ...book, quantity: 1 }
+      newCart.push(isInCart)
+    } else {
+      isInCart.quantity ++;
+    }
+
+    setBooksInCart(newCart)
+  }
 
   return (
-  <div className="App">
-    <Navbar></Navbar>
-    <h1>Books Available</h1>
-    <div className="book-list">{data.map(el => <Book book={el} handleAddToFavorites={handleAddToFavorites} />)}</div>
-    <Book />
-  </div>
+    <Router>
+      <div className="App">
+        <Navbar total={price} />
+        <Routes>
+          <Route path="/" element={<Books books={data} handleAddToFavorites={handleAddToFavorites} handleAddToCart={handleAddToCart} />} />
+          <Route path="/favorites" element={<Favorites favoriteBooks={favoriteBooks} />} />
+          <Route path="/cart" element={<Cart booksInCart={booksInCart} total={price} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
